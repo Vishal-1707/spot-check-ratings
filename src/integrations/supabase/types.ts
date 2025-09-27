@@ -78,45 +78,122 @@ export type Database = {
       }
       profiles: {
         Row: {
-          allergies: string[] | null
+          address: string | null
           created_at: string
-          date_of_birth: string | null
-          emergency_contact: string | null
-          first_name: string
+          full_name: string | null
           id: string
-          last_name: string
-          medical_conditions: string[] | null
-          medications: string[] | null
           phone: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
-          allergies?: string[] | null
+          address?: string | null
           created_at?: string
-          date_of_birth?: string | null
-          emergency_contact?: string | null
-          first_name: string
+          full_name?: string | null
           id?: string
-          last_name: string
-          medical_conditions?: string[] | null
-          medications?: string[] | null
           phone?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
-          allergies?: string[] | null
+          address?: string | null
           created_at?: string
-          date_of_birth?: string | null
-          emergency_contact?: string | null
-          first_name?: string
+          full_name?: string | null
           id?: string
-          last_name?: string
-          medical_conditions?: string[] | null
-          medications?: string[] | null
           phone?: string | null
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ratings: {
+        Row: {
+          created_at: string
+          id: string
+          rating: number
+          store_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          rating: number
+          store_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          rating?: number
+          store_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ratings_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      stores: {
+        Row: {
+          address: string
+          average_rating: number | null
+          created_at: string
+          email: string
+          id: string
+          name: string
+          total_ratings: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address: string
+          average_rating?: number | null
+          created_at?: string
+          email: string
+          id?: string
+          name: string
+          total_ratings?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address?: string
+          average_rating?: number | null
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string
+          total_ratings?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
         }
         Relationships: []
@@ -126,10 +203,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "system_administrator" | "normal_user" | "store_owner"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -256,6 +339,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["system_administrator", "normal_user", "store_owner"],
+    },
   },
 } as const
