@@ -214,7 +214,6 @@ export const AdminDashboard = () => {
 
   const filteredUsers = users.filter(user => 
     user.full_name?.toLowerCase().includes(filterName.toLowerCase()) &&
-    (!filterEmail || user.user_id?.toLowerCase().includes(filterEmail.toLowerCase())) &&
     user.address?.toLowerCase().includes(filterAddress.toLowerCase()) &&
     (!filterRole || user.user_roles?.[0]?.role === filterRole)
   );
@@ -426,13 +425,18 @@ export const AdminDashboard = () => {
               />
             </div>
             <div>
-              <Label htmlFor="filterEmail">Email</Label>
-              <Input
-                id="filterEmail"
-                placeholder="Filter by email"
-                value={filterEmail}
-                onChange={(e) => setFilterEmail(e.target.value)}
-              />
+              <Label htmlFor="filterEmail">Clear Filters</Label>
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  setFilterName('');
+                  setFilterAddress('');
+                  setFilterRole('');
+                }}
+                className="w-full"
+              >
+                Clear All Filters
+              </Button>
             </div>
             <div>
               <Label htmlFor="filterAddress">Address</Label>
@@ -474,17 +478,34 @@ export const AdminDashboard = () => {
                 <TableHead>Email</TableHead>
                 <TableHead>Address</TableHead>
                 <TableHead>Rating</TableHead>
+                <TableHead>Total Ratings</TableHead>
                 <TableHead>Owner</TableHead>
+                <TableHead>Created</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredStores.map((store) => (
                 <TableRow key={store.id}>
-                  <TableCell>{store.name}</TableCell>
+                  <TableCell className="font-medium">{store.name}</TableCell>
                   <TableCell>{store.email}</TableCell>
                   <TableCell>{store.address}</TableCell>
-                  <TableCell>{store.average_rating ? store.average_rating.toFixed(1) : '0.0'}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">{store.average_rating ? store.average_rating.toFixed(1) : '0.0'}</span>
+                      <div className="flex">
+                        {Array.from({ length: 5 }, (_, i) => (
+                          <span key={i} className={`text-xs ${i < Math.round(store.average_rating || 0) ? 'text-yellow-400' : 'text-gray-300'}`}>
+                            ★
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>{store.total_ratings || 0}</TableCell>
                   <TableCell>{store.profiles?.full_name}</TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {new Date(store.created_at).toLocaleDateString()}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -504,15 +525,21 @@ export const AdminDashboard = () => {
                 <TableHead>Name</TableHead>
                 <TableHead>Address</TableHead>
                 <TableHead>Role</TableHead>
+                <TableHead>Created</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredUsers.map((user) => (
                 <TableRow key={user.id}>
-                  <TableCell>{user.full_name}</TableCell>
+                  <TableCell className="font-medium">{user.full_name}</TableCell>
                   <TableCell>{user.address}</TableCell>
                   <TableCell>
-                    {user.user_roles?.[0]?.role?.replace('_', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
+                      {user.user_roles?.[0]?.role?.replace('_', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
+                    </span>
+                  </TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {new Date(user.created_at).toLocaleDateString()}
                   </TableCell>
                 </TableRow>
               ))}
