@@ -494,7 +494,7 @@ export const AdminDashboard = () => {
                       <span className="font-medium">{store.average_rating ? store.average_rating.toFixed(1) : '0.0'}</span>
                       <div className="flex">
                         {Array.from({ length: 5 }, (_, i) => (
-                          <span key={i} className={`text-xs ${i < Math.round(store.average_rating || 0) ? 'text-yellow-400' : 'text-gray-300'}`}>
+                          <span key={i} className={`text-xs ${i < Math.round(store.average_rating || 0) ? 'text-star-filled' : 'text-star-empty'}`}>
                             ★
                           </span>
                         ))}

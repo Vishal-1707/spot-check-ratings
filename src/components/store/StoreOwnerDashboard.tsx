@@ -181,8 +181,8 @@ export const StoreOwnerDashboard = () => {
         key={index}
         className={`w-4 h-4 ${
           index < rating 
-            ? 'fill-yellow-400 text-yellow-400' 
-            : 'text-gray-300'
+            ? 'fill-star-filled text-star-filled' 
+            : 'text-star-empty'
         }`}
       />
     ));

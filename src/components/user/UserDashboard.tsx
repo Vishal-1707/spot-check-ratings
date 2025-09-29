@@ -163,9 +163,9 @@ export const UserDashboard = () => {
         key={index}
         className={`w-5 h-5 ${
           index < rating 
-            ? 'fill-yellow-400 text-yellow-400' 
-            : 'text-gray-300'
-        } ${interactive ? 'cursor-pointer hover:text-yellow-400' : ''}`}
+            ? 'fill-star-filled text-star-filled' 
+            : 'text-star-empty'
+        } ${interactive ? 'cursor-pointer hover:text-star-filled' : ''}`}
         onClick={() => interactive && onStarClick?.(index + 1)}
       />
     ));

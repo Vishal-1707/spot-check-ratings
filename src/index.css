@@ -53,6 +53,10 @@ All colors MUST be HSL.
     --sidebar-border: 220 13% 91%;
 
     --sidebar-ring: 217.2 91.2% 59.8%;
+    
+    /* Star rating colors */
+    --star-filled: 42 96% 62%;
+    --star-empty: 215 16% 47%;
   }
 
   .dark {
@@ -91,6 +95,10 @@ All colors MUST be HSL.
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+    
+    /* Star rating colors for dark mode */
+    --star-filled: 42 96% 62%;
+    --star-empty: 215 20% 65%;
   }
 }
 
