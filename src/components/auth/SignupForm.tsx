@@ -76,12 +76,17 @@ export const SignupForm = ({ onToggleMode }: SignupFormProps) => {
           console.error('Profile creation error:', profileError);
         }
 
-        // Assign normal_user role
+        // Check if this is the first user (make them admin)
+        const { count } = await supabase
+          .from('user_roles')
+          .select('*', { count: 'exact', head: true });
+
+        const role = count === 0 ? 'system_administrator' : 'normal_user';
         const { error: roleError } = await supabase
           .from('user_roles')
           .insert({
             user_id: authData.user.id,
-            role: 'normal_user',
+            role: role,
           });
 
         if (roleError) {
@@ -90,7 +95,7 @@ export const SignupForm = ({ onToggleMode }: SignupFormProps) => {
 
         toast({
           title: "Success",
-          description: "Account created successfully! Please check your email to verify your account.",
+          description: `Account created successfully! You are assigned as: ${role.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}`,
         });
       }
     } catch (error) {

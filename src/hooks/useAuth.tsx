@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface AuthContextType {
   user: User | null;
@@ -28,6 +29,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
     // Get initial user
@@ -60,19 +62,73 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         .from('user_roles')
         .select('role')
         .eq('user_id', userId)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error('Error fetching user role:', error);
         setUserRole(null);
-      } else {
-        setUserRole(data?.role || null);
+        setLoading(false);
+        return;
       }
+      
+      // If no role exists, assign default role
+      if (!data) {
+        const assignedRole = await assignDefaultRole(userId);
+        setUserRole(assignedRole);
+        setLoading(false);
+        return;
+      }
+      
+      setUserRole(data.role || null);
+      setLoading(false);
     } catch (error) {
       console.error('Error fetching user role:', error);
       setUserRole(null);
-    } finally {
       setLoading(false);
+    }
+  };
+
+  const assignDefaultRole = async (userId: string): Promise<string | null> => {
+    try {
+      // Check if this is the first user in the system
+      const { count } = await supabase
+        .from('user_roles')
+        .select('*', { count: 'exact', head: true });
+
+      // If no users exist, make this user a system administrator
+      const role = count === 0 ? 'system_administrator' : 'normal_user';
+
+      const { error } = await supabase
+        .from('user_roles')
+        .insert({
+          user_id: userId,
+          role: role,
+        });
+
+      if (error) {
+        console.error('Error assigning default role:', error);
+        toast({
+          title: "Error",
+          description: "Failed to assign user role. Please contact an administrator.",
+          variant: "destructive",
+        });
+        return null;
+      }
+      
+      toast({
+        title: "Welcome!",
+        description: `You've been assigned the role: ${role.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}`,
+      });
+
+      return role;
+    } catch (error) {
+      console.error('Error assigning default role:', error);
+      toast({
+        title: "Error",
+        description: "Failed to assign user role. Please contact an administrator.",
+        variant: "destructive",
+      });
+      return null;
     }
   };
 
